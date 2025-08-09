@@ -58,26 +58,27 @@ pipeline {
         }
 
         stage('Update Deployment Image') {
-    steps {
-        script {
-            def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
+            steps {
+                script {
+                    def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
 
-            sh """
-                sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" ${deploymentFile}
-            """
+                    sh """
+                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" ${deploymentFile}
+                    """
 
-            withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                sh """
-                    if ! git diff --quiet; then
-                        git add ${deploymentFile}
-                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
-                    else
-                        echo "No changes to commit."
-                    fi
-                """
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            if ! git diff --quiet; then
+                                git add ${deploymentFile}
+                                git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                                git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
+                            else
+                                echo "No changes to commit."
+                            fi
+                        """
+                    }
+                }
             }
         }
     }
 }
-
