@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'srilkeha79953/myjavaapp:latest'
-            args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
         }
     }
 
@@ -17,7 +17,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 sh 'ls -ltr'
-                // build the project and create a JAR file
+                // Build the project and create a JAR file
                 sh '''
                     cd jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app
                     mvn clean package
@@ -73,6 +73,10 @@ pipeline {
                     sh """
                         sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" \
                         ${deploymentFile}
+                    """
+
+                    sh """
+                        git config --global --add safe.directory ${WORKSPACE}
                     """
 
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
