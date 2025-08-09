@@ -18,7 +18,10 @@ pipeline {
             steps {
                 sh 'ls -ltr'
                 // build the project and create a JAR file
-                sh 'cd jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
+                sh '''
+                    cd jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app
+                    mvn clean package
+                '''
             }
         }
 
@@ -61,15 +64,15 @@ pipeline {
             steps {
                 script {
                     def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
-                    sh """
+
+                    sh '''
                         cd /home
                         git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
-                    """
+                    '''
 
                     sh """
-                        sed -i "s|\(image: your-docker-image-name:\)[0-9]\+|\\1${BUILD_NUMBER}|" \
-jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-
+                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" \
+                        ${deploymentFile}
                     """
 
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
