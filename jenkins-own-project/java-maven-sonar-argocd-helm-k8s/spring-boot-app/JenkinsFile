@@ -69,7 +69,8 @@ pipeline {
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                         
                         # Push changes
-                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+                        git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
+
                     '''
                 }
             }
