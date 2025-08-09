@@ -48,11 +48,12 @@ pipeline {
     stage('Update Deployment File') {
         environment {
             GIT_REPO_NAME = "jenkins-personal-project"
-            GIT_USER_NAME = "chalapakasrilekha"
+            GIT_USER_NAME = "chalapaka srilekha"
         }
         steps {
             withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                 sh '''
+                    cd jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app
                     git config user.email "chalapakasrilekha@gmail.com"
                     git config user.name "chalapakasrilekha"
                     BUILD_NUMBER=${BUILD_NUMBER}
