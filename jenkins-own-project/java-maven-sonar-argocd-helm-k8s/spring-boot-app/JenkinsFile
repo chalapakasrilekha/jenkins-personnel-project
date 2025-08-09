@@ -67,7 +67,9 @@ pipeline {
                     """
 
                     sh """
-                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\${BUILD_NUMBER}|" ${deploymentFile}
+                        sed -i "s|\(image: your-docker-image-name:\)[0-9]\+|\\1${BUILD_NUMBER}|" \
+jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+
                     """
 
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
