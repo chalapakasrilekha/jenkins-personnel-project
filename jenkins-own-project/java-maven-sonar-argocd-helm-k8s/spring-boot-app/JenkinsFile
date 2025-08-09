@@ -56,6 +56,8 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                     sh '''
+                        git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
+                        cd jenkins-personnel-project/
                         git config user.email "chalapakasrilekha@gmail.com"
                         git config user.name "chalapakasrilekha"
                         
