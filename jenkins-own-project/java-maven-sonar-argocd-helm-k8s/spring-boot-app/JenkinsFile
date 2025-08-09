@@ -61,6 +61,10 @@ pipeline {
             steps {
                 script {
                     def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
+                    sh """
+                        cd /home
+                        git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
+                    """
 
                     sh """
                         sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" ${deploymentFile}
