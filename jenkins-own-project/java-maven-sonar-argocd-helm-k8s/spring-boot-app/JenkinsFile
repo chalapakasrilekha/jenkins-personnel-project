@@ -57,28 +57,27 @@ pipeline {
             }
         }
 
-        stage('Update Deployment File') {
-            environment {
-                GIT_REPO_NAME = "jenkins-personnel-project"
-                GIT_USER_NAME = "chalapaka srilekha"
-            }
+        stage('Update Deployment Image') {
             steps {
-                withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                    sh '''
-                        cd /home
-                        git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
-                        cd jenkins-personnel-project/
-                        git config user.email "chalapakasrilekha@gmail.com"
-                        git config user.name "chalapakasrilekha"
-                        
-                        # Update the deployment file
-                        sed -i "s|\\(image: your-docker-image-name:\\).*|\\1${BUILD_NUMBER}|" jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml     
-                        git add jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        
-                        # Push changes
-                        git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
-                    '''
+                script {
+                    // Path to your deployment YAML
+                    def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
+
+                    // Update image tag with current Jenkins build number
+                    sh """
+                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" ${deploymentFile}
+                    """
+
+                    // Add & commit only if there are changes
+                    sh """
+                        if ! git diff --quiet; then
+                            git add ${deploymentFile}
+                            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                            git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
+                        else
+                            echo "No changes to commit."
+                        fi
+                    """
                 }
             }
         }
