@@ -72,4 +72,26 @@ pipeline {
 
                     sh """
                         sed -i "s|\\(image: srilkeha79953/my-cicd:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" \
-                        jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployme
+                        jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                    """
+
+                    sh """
+                        git config --global --add safe.directory ${WORKSPACE}
+                    """
+
+                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            if ! git diff --quiet; then
+                                git add ${deploymentFile}
+                                git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                                git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
+                            else
+                                echo "No changes to commit."
+                            fi
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
