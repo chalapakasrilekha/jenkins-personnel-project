@@ -60,38 +60,26 @@ pipeline {
             }
         }
 
-        stage('Update Deployment Image') {
-            steps {
-                script {
-                    def deploymentFile = "jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml"
-
-                    sh '''
-                        cd /home
-                        git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
-                    '''
-
-                    sh """
-                        sed -i "s|\\(image: srilkeha79953/my-cicd:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" \
-                        jenkins-own-project/java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    """
-
-                    sh """
-                        git config --global --add safe.directory ${WORKSPACE}
-                    """
-
-                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                        sh """
-                            if ! git diff --quiet; then
-                                git add ${deploymentFile}
-                                git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                                git push https://${GITHUB_TOKEN}@github.com/chalapakasrilekha/jenkins-personnel-project.git HEAD:main
-                            else
-                                echo "No changes to commit."
-                            fi
-                        """
-                    }
-                }
+       stage('Update Deployment File') {
+        environment {
+            GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
+            GIT_USER_NAME = "iam-veeramalla"
+        }
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    cd /home
+                    git clone https://github.com/chalapakasrilekha/jenkins-personnel-project.git
+                    git config user.email "chalapakasrilekha@gmail.com"
+                    git config user.name "chalapaka srilekha"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                    git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
         }
     }
+  }
 }
