@@ -67,7 +67,7 @@ pipeline {
                     """
 
                     sh """
-                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\1${BUILD_NUMBER}|" ${deploymentFile}
+                        sed -i "s|\\(image: your-docker-image-name:\\)[0-9]\\+|\\${BUILD_NUMBER}|" ${deploymentFile}
                     """
 
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
